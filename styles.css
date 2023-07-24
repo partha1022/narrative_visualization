@@ -1,0 +1,47 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+#visualization {
+    margin: auto;
+    width: 80%;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles for different elements of the charts can go here */
+/* For example, if you're using SVG elements to create your charts: */
+
+svg {
+    width: 100%;
+    height: auto;
+}
+
+/* Styles for the lines on a line chart */
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
+}
+
+/* Styles for the tooltip popups */
+.tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 10px;
+    background: #efefef;
+    border: 1px solid #d4d4d4;
+    border-radius: 5px;
+    pointer-events: none; /* This makes the tooltip ignore mouse events, which can improve usability */
+}
+
+/* Styles for the annotations */
+.annotation {
+    fill: #333;
+    font-size: 12px;
+}
+
