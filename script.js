@@ -12,7 +12,8 @@ const svg = d3.select("#visualization")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
 // Load your data
-d3.csv("WHO-COVID-19-global-table-data.csv").then(data => {
+var file_url = "https://raw.githubusercontent.com/partha1022/narrative_visualization/main/WHO-COVID-19-global-data.csv"
+d3.csv(file_url).then(data => {
     // Print he data
     console.log(data)
     // Data preprocessing (parse dates, convert strings to numbers, etc.) goes here
