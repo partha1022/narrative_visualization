@@ -12,7 +12,9 @@ const svg = d3.select("#visualization")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
 // Load your data
-d3.csv("covid-data.csv").then(data => {
+d3.csv("WHO-COVID-19-global-table-data.csv").then(data => {
+    // Print he data
+    console.log(data)
     // Data preprocessing (parse dates, convert strings to numbers, etc.) goes here
 
     // Variables for scales, axes, line generators, etc. go here
