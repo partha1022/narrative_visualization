@@ -14,7 +14,7 @@ const svg = d3.select("#visualization")
 
 
 // Load your data
-var file_url = "https://raw.githubusercontent.com/partha1022/narrative_visualization/main/COVID_FULL_DATA.csv"
+var file_url = "https://raw.githubusercontent.com/partha1022/narrative_visualization/main/COVID_19_TOP_COUNTRIES.csv"
 d3.csv(file_url).then(data => {
     
     // Sort the data by total cases in descending order and take the top 10
