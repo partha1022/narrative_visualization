@@ -14,24 +14,43 @@ const svg = d3.select("#visualization")
 
 
 // Load your data
-var file_url = "https://raw.githubusercontent.com/partha1022/narrative_visualization/main/WHO-COVID-19-global-data.csv"
+var file_url = "https://raw.githubusercontent.com/partha1022/narrative_visualization/main/COVID_FULL_DATA.csv"
 d3.csv(file_url).then(data => {
+    
+    // Sort the data by total cases in descending order and take the top 10
+    var topData = data.sort((a, b) => b.total_cases - a.total_cases).slice(0, 10);
 
-    d3.json("https://d3js.org/world-110m.v1.json", function(error, world) {
-    if (error) throw error;
+    console.log(topData)
+    // Define scales
+    var xScale = d3.scaleLinear()
+        .domain([0, d3.max(topData, d => d.total_cases)])
+        .range([0, width]);
 
-    var countries = topojson.feature(world, world.objects.countries).features;
+    var yScale = d3.scaleBand()
+        .domain(topData.map(d => d.location))
+        .range([height, 0])
+        .padding(0.1);
 
-    svg.append("g").selectAll("path")
-        .data(countries)
-        .enter().append("path")
-        .attr("d", d3.geoPath().projection(d3.geoNaturalEarth1()))
-        .style("fill", function(d) { 
-        // Color the countries based on total cases
-        var totalCases = covidData[d.id].total_cases;
-        return colorScale(totalCases);
-        });
-    });
+    // Draw the bars
+    svg.selectAll(".bar")
+        .data(topData)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", 0)
+        .attr("y", d => yScale(d.location))
+        .attr("width", d => xScale(d.total_cases))
+        .attr("height", yScale.bandwidth())
+        .attr("fill", "steelblue");
+
+    // Add x-axis
+    svg.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(xScale));
+
+    // Add y-axis
+    svg.append("g")
+        .call(d3.axisLeft(yScale));
+
     
 }).catch(error => {
     console.log(error);
