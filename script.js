@@ -11,18 +11,28 @@ const svg = d3.select("#visualization")
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
+
+
 // Load your data
 var file_url = "https://raw.githubusercontent.com/partha1022/narrative_visualization/main/WHO-COVID-19-global-data.csv"
 d3.csv(file_url).then(data => {
-    // Print he data
-    console.log(data)
-    // Data preprocessing (parse dates, convert strings to numbers, etc.) goes here
 
-    // Variables for scales, axes, line generators, etc. go here
+    d3.json("https://d3js.org/world-110m.v1.json", function(error, world) {
+    if (error) throw error;
 
-    // Code to create the initial scene goes here
+    var countries = topojson.feature(world, world.objects.countries).features;
 
-    // Add event listeners for interaction goes here
+    svg.append("g").selectAll("path")
+        .data(countries)
+        .enter().append("path")
+        .attr("d", d3.geoPath().projection(d3.geoNaturalEarth1()))
+        .style("fill", function(d) { 
+        // Color the countries based on total cases
+        var totalCases = covidData[d.id].total_cases;
+        return colorScale(totalCases);
+        });
+    });
+    
 }).catch(error => {
     console.log(error);
     alert("An error occurred while loading the data.");
