@@ -11,14 +11,24 @@ const svg = d3.select("#visualization")
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-
-
 // Load your data
 var file_url = "https://raw.githubusercontent.com/partha1022/narrative_visualization/main/COVID_19_TOP_COUNTRIES.csv"
+
 d3.csv(file_url).then(data => {
-    
-    // Sort the data by total cases in descending order and take the top 10
-    var topData = data.sort((a, b) => b.total_cases - a.total_cases).slice(0, 10);
+    var parseDate = d3.timeParse("%m/%d/%Y");
+    data.forEach(d => {
+        d.date = parseDate(d.date);
+    });
+
+    // Group the data by country
+    var dataByCountry = d3.group(data, d => d.location);
+
+    // For each country, find the record with the latest date
+    var latestData = Array.from(dataByCountry, ([country, records]) => {
+        return records.reduce((a, b) => a.date > b.date ? a : b);
+    });
+    // Sort the data by total cases in descending order
+    var topData = latestData.sort((a, b) => b.total_cases - a.total_cases);
 
     console.log(topData)
     // Define scales
