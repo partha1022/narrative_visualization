@@ -38,6 +38,14 @@ body {
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
+#visualization-scene3 {
+    margin: auto;
+    width: 80%;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 /* Styles for different elements of the charts can go here */
 /* For example, if you're using SVG elements to create your charts: */
 

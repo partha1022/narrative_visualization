@@ -134,21 +134,21 @@ function createScene2() {
 
 
     d3.csv(file_url).then(data => {
-
-        var parseDate = d3.timeParse("%m/%d/%Y");
         data.forEach(d => {
-            d.date = parseDate(d.date);
+            d.people_vaccinated = +d.people_vaccinated;
         });
 
-        // Group the data by country
-        var dataByCountry = d3.group(data, d => d.location);
+        var dataByCountry = Array.from(
+            d3.rollup(
+                data,
+                v => ({people_vaccinated: d3.max(v, d => d.people_vaccinated)}),
+                d => d.location
+            ),
+            ([key, value]) => (value.location = key, value)
+        ); 
 
-        // For each country, find the record with the latest date
-        var latestData = Array.from(dataByCountry, ([country, records]) => {
-            return records.reduce((a, b) => a.date > b.date ? a : b);
-        });
         // Sort the data by total cases in descending order
-        var topData = latestData.sort((a, b) => a.people_vaccinated - b.people_vaccinated);
+        var topData = dataByCountry.sort((a, b) => a.people_vaccinated - b.people_vaccinated);
 
         console.log(topData)
 
@@ -168,7 +168,7 @@ function createScene2() {
         .attr("text-anchor", "middle")
         .style("font-size", "16px")
         .style("text-decoration", "underline")
-        .text("Total COVID-19 Deaths by Country");
+        .text("Total vaccinationations by Country");
 
         svg_scene_1.selectAll(".bar")
         .data(topData)
@@ -180,7 +180,7 @@ function createScene2() {
         .attr("height", d => height - yScale(+d.people_vaccinated))
         .attr("fill", "steelblue")
         .append("title")  // Append a title to each bar
-        .text(d => `Total Deaths: ${formatNumber(d.people_vaccinated)}`);
+        .text(d => `Persons Vaccinated: ${formatNumber(d.people_vaccinated)}`);
 
         // Add x-axis
         svg_scene_1.append("g")
@@ -201,4 +201,12 @@ function createScene2() {
         console.log(error);
         alert("An error occurred while loading the visualization.");
     });    
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Visualization scene 3
+function createScene3() {
+
+
 }

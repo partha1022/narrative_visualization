@@ -23,6 +23,10 @@
                 console.log("in scene 2")
                 createScene2();
             }
+            else if (id === "scene3") {
+                console.log("in scene 3")
+                createScene3();
+            }
             // Add more else if statements for more scenes...
         }
 
@@ -41,7 +45,7 @@
     <div>
         <button class="scene-button first-button" onclick="showScene('scene1')">1</button>
         <button class="scene-button" onclick="showScene('scene2')">2</button>
-        <!-- Add more buttons for more scenes... -->
+        <button class="scene-button" onclick="showScene('scene3')">3</button>
     </div>
 
     <div id="scene1" class="scene">
@@ -56,6 +60,11 @@
         </div>
     </div>
 
+    <div id="scene3" class="scene">
+        <div id="visualization-scene3">
+            <!--  visualization will be inserted here -->
+        </div>
+    </div>
     
     <script src="script.js"></script>
     <h5>Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
