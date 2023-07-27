@@ -7,12 +7,12 @@ header {
 }
 
 header h1 {
-    font-size: 1.5em;
+    font-size: 1em;
     margin-bottom: 0.5em;
 }
 
 header h2 {
-    font-size: 1em;
+    font-size: 0.8em;
     color: #ddd;
 }
 
@@ -23,14 +23,21 @@ body {
     background-color: #f4f4f4;
 }
 
-#visualization {
+#visualization-scene1 {
     margin: auto;
     width: 80%;
-    padding: 20px;
+    padding: 10px;
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+#visualization-scene2 {
+    margin: auto;
+    width: 80%;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 /* Styles for different elements of the charts can go here */
 /* For example, if you're using SVG elements to create your charts: */
 
@@ -63,3 +70,26 @@ svg {
     font-size: 12px;
 }
 
+.scene {
+    display: none;  /* Hide all scenes by default */
+}
+.active {
+    display: block;  /* Show the active scene */
+}
+
+.scene-button {
+    background-color: #4CAF50; /* Green background */
+    border: none; /* No border */
+    color: white; /* White text */
+    padding: 5px 20px; /* Padding */
+    text-align: center; /* Centered text */
+    text-decoration: none; /* No underline */
+    display: inline-block;
+    font-size: 12px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.first-button {
+    margin-left: 140px;  /* Add a margin to the left of the first button */
+}

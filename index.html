@@ -6,15 +6,65 @@
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="https://unpkg.com/topojson-client@3"></script>
     <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+    <script>
+        function showScene(id) {
+            // Hide all scenes
+            d3.selectAll(".scene").classed("active", false);
+
+            // Show the selected scene
+            d3.select("#" + id).classed("active", true);
+
+            // Call the function to create the scene
+            if (id === "scene1") {
+                console.log("in scene 1")
+                console.log(id)
+                createScene1();
+            } else if (id === "scene2") {
+                console.log("in scene 2")
+                createScene2();
+            }
+            // Add more else if statements for more scenes...
+        }
+
+        // Show the first scene when the page loads
+        window.onload = function() {
+            showScene("scene1");
+        };
+    </script>
 </head>
 <body>
     <header>
         <h1>COVID-19 Pandemic: A Narrative Visualization</h1>
         <h2>Understanding the global impact of the pandemic through data</h2>
     </header>
-    <div id="visualization">
-        <!-- Your visualization will be inserted here -->
+
+    <div>
+        <button class="scene-button first-button" onclick="showScene('scene1')">1</button>
+        <button class="scene-button" onclick="showScene('scene2')">2</button>
+        <!-- Add more buttons for more scenes... -->
     </div>
+
+    <div id="scene1" class="scene">
+        <div id="visualization-scene1">
+            <!--  visualization will be inserted here -->
+        </div>
+    </div>
+
+    <div id="scene2" class="scene">
+        <div id="visualization-scene2">
+            <!--  visualization will be inserted here -->
+        </div>
+    </div>
+
+    
     <script src="script.js"></script>
+    <h5>Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
+        when an unknown printer took a galley of type and scrambled it to make a type specimen book. 
+        It has survived not only five centuries, but also the leap into electronic typesetting, 
+        remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset 
+        sheets containing Lorem Ipsum passages, and more recently with desktop publishing software 
+        like Aldus PageMaker including versions of Lorem Ipsum.
+    </h5>
 </body>
 </html>

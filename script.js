@@ -1,70 +1,204 @@
-// Define the dimensions of your visualization
-const margin = {top: 50, right: 50, bottom: 50, left: 50},
-      width = 960 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
+var formatNumber = d3.format(",");
 
-// Create the SVG container for your visualization and append it to the #visualization div
-const svg = d3.select("#visualization")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+// Define the dimensions of your visualization
+const margin = {top: 40, right: 10, bottom: 60, left: 60},
+width = 1200 - margin.left - margin.right,
+height = 500 - margin.top - margin.bottom;
+
 
 // Load your data
 var file_url = "https://raw.githubusercontent.com/partha1022/narrative_visualization/main/COVID_19_TOP_COUNTRIES.csv"
 
-d3.csv(file_url).then(data => {
-    var parseDate = d3.timeParse("%m/%d/%Y");
-    data.forEach(d => {
-        d.date = parseDate(d.date);
-    });
 
-    // Group the data by country
-    var dataByCountry = d3.group(data, d => d.location);
-
-    // For each country, find the record with the latest date
-    var latestData = Array.from(dataByCountry, ([country, records]) => {
-        return records.reduce((a, b) => a.date > b.date ? a : b);
-    });
-    // Sort the data by total cases in descending order
-    var topData = latestData.sort((a, b) => b.total_cases - a.total_cases);
-
-    console.log(topData)
+function createScene1() {
+    d3.select("#visualization-scene1").select("svg").remove();
     // Define scales
-    var xScale = d3.scaleLinear()
-        .domain([0, d3.max(topData, d => d.total_cases)])
-        .range([0, width]);
+    var xScale = d3.scaleLog().base(10).range([0, width]);
+    var yScale = d3.scaleLog().base(10).range([height, 0]);
 
-    var yScale = d3.scaleBand()
-        .domain(topData.map(d => d.location))
-        .range([height, 0])
-        .padding(0.1);
+    // Define the line generator
+    var line = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => yScale(d.total_cases));
 
-    // Draw the bars
-    svg.selectAll(".bar")
+    var tooltip = d3.select("#visualization-scene1").append("div")   
+                    .attr("class", "tooltip")               
+                    .style("opacity", 0);
+
+    // Create the SVG container
+    var svg = d3.select("#visualization-scene1").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Load your data
+    d3.csv(file_url).then(data => {
+        // Parse numbers
+        data.forEach(d => {
+            d.total_cases = +d.total_cases;
+            d.total_deaths = +d.total_deaths;
+            d.total_deaths_per_million = +d.total_deaths_per_million;
+        });
+
+        var dataByCountry = Array.from(
+            d3.rollup(
+                data,
+                v => ({total_cases: d3.max(v, d => d.total_cases), 
+                        total_deaths: d3.max(v, d => d.total_deaths),
+                        total_deaths_per_million: d3.max(v, d => d.total_deaths_per_million)}),
+                d => d.location
+            ),
+            ([key, value]) => (value.location = key, value)
+        );        
+
+        xScale.domain([3000000, d3.max(dataByCountry, d => d.total_cases)]);
+        yScale.domain([40000, d3.max(dataByCountry, d => d.total_deaths)]);
+
+        console.log(dataByCountry)
+        
+        // Add the points to the SVG
+        svg.append("g").selectAll("circle")
+        .data(dataByCountry)
+        .enter().append("circle")
+            .attr("r", 7)
+            .attr("cx", d => xScale(d.total_cases))
+            .attr("cy", d => yScale(d.total_deaths))
+            .style("fill", "steelblue")
+            .on("mouseover", (event, d) => {
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+            })
+            .on("mousemove", (event, d) => {
+                console.log(d.location)
+                console.log(d.total_deaths_per_million)
+                tooltip.html("Country: " + d.location + "<br/>Total Cases: " + formatNumber(d.total_cases)
+                    + "<br/>Total Deaths: " + formatNumber(d.total_deaths) + "<br/>Total Deaths/million: " + 
+                    formatNumber(d.total_deaths_per_million))
+                    .style("left", (event.x+25) + "px")
+                    .style("top", (event.y) + "px");
+            })
+            .on("mouseout", (event, d) => {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            });
+
+        // Add the x-axis
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(xScale).tickFormat(d3.format("~s")));
+
+        // Add the y-axis
+        svg.append("g")
+            .call(d3.axisLeft(yScale).tickFormat(d3.format("~s")));
+
+        // Define your annotations
+        var annotations = [{
+            note: {
+            label: "Highest Death Per million: 6,491.797"
+            },
+            x: 75,
+            y: 155,
+            dy: -20,
+            dx: 20
+        }]
+        
+        // Add the annotation
+        var makeAnnotations = d3.annotation()
+            .annotations(annotations)
+        
+        svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .call(makeAnnotations)
+  
+
+    }).catch(error => {
+        console.log(error);
+        alert("An error occurred while loading the visualization.");
+    });
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Visualization scene 2
+
+function createScene2() {
+    // Create the SVG container for your visualization and append it to the #visualization div
+    d3.select("#visualization-scene2").select("svg").remove();
+    svg_scene_1 = d3.select("#visualization-scene2")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+
+    d3.csv(file_url).then(data => {
+
+        var parseDate = d3.timeParse("%m/%d/%Y");
+        data.forEach(d => {
+            d.date = parseDate(d.date);
+        });
+
+        // Group the data by country
+        var dataByCountry = d3.group(data, d => d.location);
+
+        // For each country, find the record with the latest date
+        var latestData = Array.from(dataByCountry, ([country, records]) => {
+            return records.reduce((a, b) => a.date > b.date ? a : b);
+        });
+        // Sort the data by total cases in descending order
+        var topData = latestData.sort((a, b) => a.people_vaccinated - b.people_vaccinated);
+
+        console.log(topData)
+
+        // Define scales
+        var xScale = d3.scaleBand()
+            .domain(topData.map(d => d.location))
+            .range([0, width])
+            .padding(0.1);
+
+        var yScale = d3.scaleLinear()
+            .domain([0, d3.max(topData, d => +d.people_vaccinated) + 100000])
+            .range([height, 0]);
+
+        svg_scene_1.append("text")
+        .attr("x", width / 2)
+        .attr("y", 0 - margin.top / 2)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text("Total COVID-19 Deaths by Country");
+
+        svg_scene_1.selectAll(".bar")
         .data(topData)
         .enter().append("rect")
         .attr("class", "bar")
-        .attr("x", 0)
-        .attr("y", d => yScale(d.location))
-        .attr("width", d => xScale(d.total_cases))
-        .attr("height", yScale.bandwidth())
-        .attr("fill", "steelblue");
+        .attr("x", d => xScale(d.location))
+        .attr("y", d => yScale(+d.people_vaccinated))
+        .attr("width", xScale.bandwidth())
+        .attr("height", d => height - yScale(+d.people_vaccinated))
+        .attr("fill", "steelblue")
+        .append("title")  // Append a title to each bar
+        .text(d => `Total Deaths: ${formatNumber(d.people_vaccinated)}`);
 
-    // Add x-axis
-    svg.append("g")
-        .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(xScale));
+        // Add x-axis
+        svg_scene_1.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(xScale))
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
 
-    // Add y-axis
-    svg.append("g")
-        .call(d3.axisLeft(yScale));
+        // Add y-axis
+        svg_scene_1.append("g")
+            .call(d3.axisLeft(yScale));
 
-    
-}).catch(error => {
-    console.log(error);
-    alert("An error occurred while loading the data.");
-});
-
-// Function definitions for updating the visualization based on interaction or new data goes here
+        
+    }).catch(error => {
+        console.log(error);
+        alert("An error occurred while loading the visualization.");
+    });    
+}
