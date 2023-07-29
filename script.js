@@ -2,7 +2,7 @@ var formatNumber = d3.format(",");
 var formatDecimalNumber = d3.format(".2f");
 
 // Define the dimensions of your visualization
-const margin = {top: 40, right: 10, bottom: 70, left: 60},
+const margin = {top: 40, right: 10, bottom: 70, left: 65},
 width = 1200 - margin.left - margin.right,
 height = 500 - margin.top - margin.bottom;
 
@@ -100,7 +100,7 @@ function createScene1() {
             note: {
             label: "Peru: Highest Death/million"
             },
-            x: 70,
+            x: 65,
             y: 155,
             dy: -20,
             dx: 20
@@ -109,7 +109,7 @@ function createScene1() {
             note: {
             label: "USA: Highest Cases and Death"
             },
-            x: 1065,
+            x: 1060,
             y: -40,
             dy: 20,
             dx: -20
@@ -270,7 +270,6 @@ function createScene2() {
     });    
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Visualization scene 3
 function createScene3() {
@@ -336,7 +335,9 @@ function createScene3() {
                 DisplayDeathsChart(filteredData, svg_scene_3, selectedCountry);
             } else if(selectedViz == "Total Vaccinations") {
                 DisplayVaccinationChart(filteredData, svg_scene_3, selectedCountry);
-            } 
+            } else if(selectedViz == "All Charts") {
+                DisplayAllLinesChart(filteredData, svg_scene_3, selectedCountry);
+            }
 
         }
 
@@ -364,9 +365,10 @@ function displayCasesChart(filteredData, svg_scene_3, selectedCountry) {
     
     // Reset the area
     //console.log(svg_scene_3._groups[0])
-    svg_scene_3.select("path").remove();
+    svg_scene_3.selectAll("path").remove();
     svg_scene_3.selectAll("g").remove();
     svg_scene_3.selectAll("text").remove();
+    svg_scene_3.selectAll("circle").remove();
 
     // Add the line to the SVG
     svg_scene_3.append("path")
@@ -428,9 +430,10 @@ function DisplayDeathsChart(filteredData, svg_scene_3, selectedCountry){
     
     // Reset the area
     //console.log(svg_scene_3._groups[0])
-    svg_scene_3.select("path").remove();
+    svg_scene_3.selectAll("path").remove();
     svg_scene_3.selectAll("g").remove();
     svg_scene_3.selectAll("text").remove();
+    svg_scene_3.selectAll("circle").remove();
 
     // Add the line to the SVG
     svg_scene_3.append("path")
@@ -487,12 +490,13 @@ function DisplayVaccinationChart(filteredData, svg_scene_3, selectedCountry) {
                 
     xScale.domain(d3.extent(filteredData, d => d.date));
     yScale.domain([0, d3.max(filteredData, d => d.people_vaccinated)]);  
-    
+
     // Reset the area
     //console.log(svg_scene_3._groups[0])
-    svg_scene_3.select("path").remove();
+    svg_scene_3.selectAll("path").remove();
     svg_scene_3.selectAll("g").remove();
     svg_scene_3.selectAll("text").remove();
+    svg_scene_3.selectAll("circle").remove();
 
     // Add the line to the SVG
     svg_scene_3.append("path")
@@ -536,6 +540,134 @@ function DisplayVaccinationChart(filteredData, svg_scene_3, selectedCountry) {
                 .attr("text-anchor", "middle")
                 .style("font-size", "16px")
                 .style("text-decoration", "underline")
-                .text(selectedCountry + " Total People Vaccinated");
+                .text(selectedCountry + " Total People Vaccinated");    
+}
+
+function DisplayAllLinesChart(filteredData, svg_scene_3, selectedCountry) {
+    console.log("inside all charts")
+    var xScale = d3.scaleTime().range([0, width]);
+    var yScale = d3.scaleLog().base(2).range([height, 0]);
+
+    var cases_line = d3.line()
+                .x(d => xScale(d.date))
+                .y(d => yScale(d.total_cases + 1));
+            
+    var death_line = d3.line()
+                    .x(d => xScale(d.date))
+                    .y(d => yScale(d.total_deaths+1));
+    
+    var vaccinated_line = d3.line()
+                    .x(d => xScale(d.date))
+                    .y(d => yScale(d.people_vaccinated+1));
+
+    xScale.domain(d3.extent(filteredData, d => d.date));
+    yScale.domain([1, d3.max(filteredData, d => d.people_vaccinated)]);  
+
+    svg_scene_3.selectAll("path").remove();
+    svg_scene_3.selectAll("g").remove();
+    svg_scene_3.selectAll("text").remove();
+    svg_scene_3.selectAll("circle").remove();
+
+    // Add the line to the SVG
+    svg_scene_3.append("path")
+                .datum(filteredData)
+                .attr("fill", "none")
+                .attr("stroke", "steelblue")
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-width", 1.5)
+                .attr("d", cases_line);
+    
+    svg_scene_3.append("path")
+                .datum(filteredData)
+                .attr("fill", "none")
+                .attr("stroke", "red")
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-width", 1.5)
+                .attr("d", death_line);
+    
+    svg_scene_3.append("path")
+                .datum(filteredData)
+                .attr("fill", "none")
+                .attr("stroke", "green")
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-width", 1.5)
+                .attr("d", vaccinated_line);
+
+    // Add the x-axis
+    svg_scene_3.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(xScale));
+
+    // Add the y-axis
+    svg_scene_3.append("g")
+                .call(d3.axisLeft(yScale).tickFormat(d3.format("~s")).ticks(10));
+
+    // X-Axis Label
+    svg_scene_3.append("text")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom)
+        .style("text-anchor", "middle")
+        .text("Year");
+    
+    // Y-Axis Label
+    svg_scene_3.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Population");
+    
+    // Chart title
+    svg_scene_3.append("text")
+                .attr("x", width / 2)
+                .attr("y", 0 - (margin.top / 2))
+                .attr("text-anchor", "middle")
+                .style("font-size", "16px")
+                .style("text-decoration", "underline")
+                .text(selectedCountry + " All Charts");
+
+    // Add legends
+    svg_scene_3.append("circle")
+                .attr("cx", width - 110)
+                .attr("cy", 190)
+                .attr("r", 6)
+                .style("fill", "steelblue")
+
+    svg_scene_3.append("circle")
+                .attr("cx", width - 110)
+                .attr("cy",220)
+                .attr("r", 6)
+                .style("fill", "red")
+
+    svg_scene_3.append("circle")
+                .attr("cx", width - 110)
+                .attr("cy",250)
+                .attr("r", 6)
+                .style("fill", "green")
+
+    svg_scene_3.append("text")
+                .attr("x", width - 95)
+                .attr("y", 190)
+                .text("Total Cases")
+                .style("font-size", "15px")
+                .attr("alignment-baseline","middle")
+
+    svg_scene_3.append("text")
+                .attr("x", width - 95)
+                .attr("y", 220)
+                .text("Total Deaths")
+                .style("font-size", "15px")
+                .attr("alignment-baseline","middle")
+
+    svg_scene_3.append("text")
+                .attr("x", width - 95)
+                .attr("y", 250)
+                .text("Total Vaccinated")
+                .style("font-size", "15px")
+                .attr("alignment-baseline","middle")
 
 }
