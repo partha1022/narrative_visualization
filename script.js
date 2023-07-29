@@ -291,7 +291,7 @@ function createScene3() {
                 .append("option")
                 .text(d => d);
         
-        var visualizations = ["Total Cases", "Total Deaths", "Total Vaccinations", "Patients in ICU", "Patients in hospital"]
+        var visualizations = ["Total Cases", "Total Deaths", "Total Vaccinations", "All Charts"]
         d3.select("#select-viz").selectAll("option")
               .data(visualizations)
               .enter()
