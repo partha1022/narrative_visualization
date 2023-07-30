@@ -56,7 +56,7 @@ function createScene1() {
         xScale.domain([3000000, d3.max(dataByCountry, d => d.total_cases)]);
         yScale.domain([40000, d3.max(dataByCountry, d => d.total_deaths)]);
 
-        console.log(dataByCountry)
+        //console.log(dataByCountry)
         
         // Add the points to the SVG
         svg.append("g").selectAll("circle")
@@ -72,8 +72,8 @@ function createScene1() {
                     .style("opacity", .9);
             })
             .on("mousemove", (event, d) => {
-                console.log(d.location)
-                console.log(d.total_deaths_per_million)
+                //console.log(d.location)
+                //console.log(d.total_deaths_per_million)
                 tooltip.html("Country: " + d.location + "<br/>Total Cases: " + formatNumber(d.total_cases)
                     + "<br/>Total Deaths: " + formatNumber(d.total_deaths) + "<br/>Total Deaths/million: " + 
                     formatNumber(d.total_deaths_per_million))
@@ -151,7 +151,7 @@ function createScene1() {
 
 
     }).catch(error => {
-        console.log(error);
+        //console.log(error);
         alert("An error occurred while loading the visualization.");
     });
 }
@@ -186,7 +186,7 @@ function createScene2() {
         // Sort the data by total cases in descending order
         var topData = dataByCountry.sort((a, b) => a.percentage_people_vaccinated - b.percentage_people_vaccinated);
 
-        console.log(topData)
+        //console.log(topData)
 
         // Define scales
         var xScale = d3.scaleBand()
@@ -265,7 +265,7 @@ function createScene2() {
                     .text("World Average Vaccination");
                             
     }).catch(error => {
-        console.log(error);
+        //console.log(error);
         alert("An error occurred while loading the visualization.");
     });    
 }
@@ -318,13 +318,13 @@ function createScene3() {
             var selectedCountry = countrySelect.property("value");
             var selectedViz = parameterSelect.property("value");
 
-            console.log(selectedCountry);
-            console.log(selectedViz);
+            //console.log(selectedCountry);
+            //console.log(selectedViz);
 
             // Filter data based on selected country
             var filteredData = data.filter(d => d.location === selectedCountry);
 
-            console.log(filteredData)
+            //console.log(filteredData)
             
             // Remove existing chart if there is one
             //d3.select("#visualization-scene3").select("svg").selectAll("*").remove();
@@ -345,7 +345,7 @@ function createScene3() {
         updateChart();
     
     }).catch(error => {
-        console.log(error);
+        //console.log(error);
         alert("An error occurred while loading the visualization.");
     });  
 
@@ -544,7 +544,7 @@ function DisplayVaccinationChart(filteredData, svg_scene_3, selectedCountry) {
 }
 
 function DisplayAllLinesChart(filteredData, svg_scene_3, selectedCountry) {
-    console.log("inside all charts")
+    //console.log("inside all charts")
     var xScale = d3.scaleTime().range([0, width]);
     var yScale = d3.scaleLog().base(2).range([height, 0]);
 
